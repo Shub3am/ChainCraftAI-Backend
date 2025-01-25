@@ -5,6 +5,8 @@ from generateEmbedding import embeddings
 from vectorDB import vectorStore
 from vectorDB import persistClient
 from langchain_ollama import OllamaLLM
+from langchain_groq import ChatGroq
+from langchain_core.prompts import PromptTemplate
 
 
 def indexer():
@@ -35,12 +37,13 @@ def getQuery(query):
             return joinPrompts
 
 
-def generateQuery(query, similarity_search):   
-        LLM = OllamaLLM(model="qwen2.5-coder:7b")
-        prompt = LLM.invoke("generate a dapp using solidity")
-        print(prompt)
+def generateQuery(query,):   
+        llm = OllamaLLM(model="tinyllama")
+        LLM = OllamaLLM(model="qwen2.5-coder:3b")
+        get_similarity_search_query = llm.invoke("Generate Queries for the documentation of Solidity for the project: " + query)
+        RAG_data = getQuery(get_similarity_search_query)
+        dapp_prompt_template = PromptTemplate.from_template("You have to build a complete dapp using solidity for the {topic} \n Here are the details from Solidity's Documentation: {docs} \n Seperate Each File in Markdown")
+        promptGenerated = dapp_prompt_template.invoke({"topic": query, "docs": RAG_data})
+        return promptGenerated
         
- 
-
-generateQuery("ge", "")
   
